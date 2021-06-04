@@ -1,0 +1,14 @@
+aufnahme_Fahrt_Aachen.h264
+laneVideo.h264
+.vscode/c_cpp_properties.json
+.vscode/*
+build/*
+sln/*
+configs/yolov4.weights
+configs/yolov4.cfg
+configs/yolov4-tiny.cfg
+configs/yolov4-tiny.weights
+configs/yolov4-kFLOAT-batch1.engine
+configs/yolov4-tiny-kFLOAT-batch1.engine
+configs/yolov3.cfg
+configs/yolov3-tiny.cfg
