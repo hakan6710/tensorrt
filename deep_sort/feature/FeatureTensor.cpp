@@ -4,12 +4,14 @@
  *  Created on: Dec 15, 2017
  *      Author: zy
  */
-
+#include <fstream>
+#include<iostream>
+using namespace std;
 #include "FeatureTensor.h"
 using namespace tensorflow;
 
-#define TENSORFLOW_MODEL_META "./RUNNINGDATA/tensor_networks/111.meta"
-#define TENSORFLOW_MODEL "./RUNNINGDATA/tensor_networks/mars-small128.ckpt-68577"
+#define TENSORFLOW_MODEL_META "../deep_sort/feature/RUNNINGDATA/tensor_networks/111.meta"
+#define TENSORFLOW_MODEL "../deep_sort/feature/RUNNINGDATA/tensor_networks/mars-small128.ckpt-68577"
 
 FeatureTensor *FeatureTensor::instance = NULL;
 
@@ -33,7 +35,23 @@ FeatureTensor::~FeatureTensor() {
 	outnames.clear();
 }
 
+void FeatureTensor::killIt(){
+	session->Close();
+	delete session;
+	output_tensors.clear();
+	outnames.clear();
+	instance=NULL;
+}
+
 bool FeatureTensor::init() {
+
+	ifstream ifile;
+	ifile.open(TENSORFLOW_MODEL_META);
+	if(ifile) {
+		cout<<"file exists";
+	} else {
+		cout<<"file doesn't exist";
+	}
 	tensorflow::SessionOptions sessOptions;
 	sessOptions.config.mutable_gpu_options()->set_allow_growth(true);
 	session = NewSession(sessOptions);
@@ -65,8 +83,10 @@ bool FeatureTensor::init() {
 bool FeatureTensor::getRectsFeature(const cv::Mat& img, DETECTIONS& d) {
 	std::vector<cv::Mat> mats;
 	for(DETECTION_ROW& dbox : d) {
+		if(dbox.confidence!=0){
 		cv::Rect rc = cv::Rect(int(dbox.tlwh(0)), int(dbox.tlwh(1)),
-				int(dbox.tlwh(2)), int(dbox.tlwh(3)));
+			int(dbox.tlwh(2)), int(dbox.tlwh(3)));
+			
 		rc.x -= (rc.height * 0.5 - rc.width) * 0.5;
 		rc.width = rc.height * 0.5;
 		rc.x = (rc.x >= 0 ? rc.x : 0);
@@ -77,6 +97,7 @@ bool FeatureTensor::getRectsFeature(const cv::Mat& img, DETECTIONS& d) {
 		cv::Mat mattmp = img(rc).clone();
 		cv::resize(mattmp, mattmp, cv::Size(64, 128));
 		mats.push_back(mattmp);
+		}
 	}
 	int count = mats.size();
 

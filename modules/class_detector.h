@@ -4,6 +4,7 @@
 #include "../extra/API.h"
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include "./../deep_sort/feature/model.h"
 
 struct Result
 {
@@ -60,6 +61,7 @@ public:
 	void init(const Config &config);
 
 	void detect(const std::vector<cv::Mat> &mat_image, std::vector<BatchResult> &vec_batch_result);
+	void detect2(const std::vector<cv::Mat>	&vec_image,DETECTIONS &detections);
 
 private:
 	

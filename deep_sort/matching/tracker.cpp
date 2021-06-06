@@ -21,6 +21,7 @@ tracker::tracker(/*NearNeighborDisMetric *metric,*/
     this->max_age = max_age;
     this->n_init = n_init;
 
+
     this->kf = new KalmanFilter();
     this->tracks.clear();
     this->_next_idx = 1;

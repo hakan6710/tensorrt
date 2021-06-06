@@ -23,8 +23,13 @@ find_package(OpenCV REQUIRED)
 find_package (Eigen3  REQUIRED NO_MODULE)
 find_package(TensorflowCC REQUIRED)
 
+
 #detector lib (cuda)
-file(GLOB_RECURSE sources  "deep_sort/*/*.cpp" "deep_sort/*/*.h"    modules/*.hpp modules/*.cpp modules/*.h modules/*.cu extra/*.h)
+file(GLOB_RECURSE sources  "deep_sort/*/*.cpp" "deep_sort/*/*.h"
+modules/*.hpp modules/*.cpp modules/*.h modules/*.cu extra/*.h )
+
+#"sort/*/*.cpp" "sort/*/*.h" 
+
 #file(GLOB source_files "*.h" "*.cpp" "deep_sort/*/*.cpp" "deep_sort/*/*.h" )
 add_library(detector SHARED ${sources})
 
@@ -32,10 +37,9 @@ target_include_directories(detector PRIVATE extra/ modules/   ${OpenCV_INCLUDE_D
 target_link_libraries(detector TensorflowCC::TensorflowCC Eigen3::Eigen nvinfer nvinfer_plugin nvparsers "stdc++fs")
 
 
-add_executable(yolo-trt sample_detector.cpp )				  
+add_executable(yolo-trt sample_detector.cpp )	
+			  
 target_include_directories(yolo-trt PRIVATE modules/ extra/ deep_sort/feature/ deep_sort/matching/ deep_sort/thirdPart)
-target_link_libraries(yolo-trt detector ${OpenCV_LIBS} )
+target_link_libraries(yolo-trt detector ${OpenCV_LIBS})
 
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
-include_directories(${EIGEN_INCLUDE_DIR})

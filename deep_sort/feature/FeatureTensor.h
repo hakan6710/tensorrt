@@ -14,6 +14,7 @@ class FeatureTensor
 public:
 	static FeatureTensor* getInstance();
 	bool getRectsFeature(const cv::Mat& img, DETECTIONS& d);
+	void killIt();
 
 private:
 	FeatureTensor();
@@ -22,6 +23,7 @@ private:
 	static FeatureTensor* instance;
 	bool init();
 	~FeatureTensor();
+	
 
 	void tobuffer(const std::vector<cv::Mat> &imgs, uint8 *buf);
 

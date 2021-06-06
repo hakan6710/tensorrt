@@ -9,6 +9,7 @@ public:
     DETECTBOX tlwh; //np.float
     float confidence; //float
     FEATURE feature; //np.float32
+    int class_id;
     DETECTBOX to_xyah() const;
     DETECTBOX to_tlbr() const;
 };

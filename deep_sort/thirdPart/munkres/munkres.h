@@ -28,7 +28,6 @@
 #include <cmath>
 #include <limits>
 
-
 template<typename Data> class Munkres
 {
     static constexpr int NORMAL = 0;
@@ -49,7 +48,7 @@ public:
     void solve(Matrix<Data> &m) {
         const size_t rows = m.rows(),
                 columns = m.columns(),
-                size = XYZMAX(rows, columns);
+                size = std::max(rows, columns);
 
 #ifdef DEBUG
         std::cout << "Munkres input: " << m << std::endl;
@@ -142,7 +141,7 @@ public:
     static void replace_infinites(Matrix<Data> &matrix) {
       const size_t rows = matrix.rows(),
                 columns = matrix.columns();
-      //assert( rows > 0 && columns > 0 );
+      assert( rows > 0 && columns > 0 );
       double max = matrix(0, 0);
       constexpr auto infinity = std::numeric_limits<double>::infinity();
 
@@ -153,7 +152,7 @@ public:
             if ( max == infinity ) {
               max = matrix(row, col);
             } else {
-              max = XYZMAX(max, matrix(row, col));
+              max = std::max<double>(max, matrix(row, col));
             }
           }
         }
@@ -176,6 +175,7 @@ public:
       }
 
     }
+
     static void minimize_along_direction(Matrix<Data> &matrix, const bool over_columns) {
       const size_t outer_size = over_columns ? matrix.columns() : matrix.rows(),
                    inner_size = over_columns ? matrix.rows() : matrix.columns();
@@ -189,7 +189,7 @@ public:
         // keep looking for the minimum.
         // Start at one because we already have the 0th value in min.
         for ( size_t j = 1 ; j < inner_size && min > 0 ; j++ ) {
-          min = XYZMIN(
+          min = std::min<double>(
             min,
             over_columns ? matrix(j, i) : matrix(i, j));
         }
@@ -421,7 +421,7 @@ private:
      3. Subtract h from all uncovered columns
      4. Return to Step 3, without altering stars, primes, or covers.
     */
-	double h = 100000;//xyzoylz std::numeric_limits<double>::max();
+    double h = std::numeric_limits<double>::max();
     for ( size_t row = 0 ; row < rows ; row++ ) {
       if ( !row_mask[row] ) {
         for ( size_t col = 0 ; col < columns ; col++ ) {

@@ -34,3 +34,8 @@ void Detector::detect(const std::vector<cv::Mat> &mat_image, std::vector<BatchRe
 {
 	_impl->_detector.detect(mat_image, vec_batch_result);
 }
+
+void Detector::detect2(const std::vector<cv::Mat>	&vec_image,DETECTIONS &detections)
+{
+	_impl->_detector.detect2(vec_image, detections);
+}

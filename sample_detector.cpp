@@ -12,6 +12,8 @@
 #define args_max_cosine_distance 0.2
 #define args_min_confidence 0.3
 #define args_nms_max_overlap 1.0
+using namespace cv;
+using namespace std;
 
 cv::VideoCapture *cap;
 
@@ -79,6 +81,7 @@ Config getDetectorConfig()
 
 int main()
 {
+	
 	tracker t;
 	Timer timer;
 	InitCap();
@@ -89,9 +92,8 @@ int main()
 	std::unique_ptr<Detector> detector(new Detector());
 	detector->init(cfg);
 
-	
+	DETECTIONS detections;
 	while(!(currentFrame=getNextFrame()).empty()){
-		std::vector<BatchResult> batch_res;
 		std::vector<cv::Mat> batch_img;
 		batch_img.push_back(currentFrame);
 
@@ -99,8 +101,35 @@ int main()
 		
 		auto start= std::chrono::steady_clock::now();
 
+		//std::cout<<"Detect Count="<<detections.size()<<"\n";
 
-		detector->detect(batch_img, batch_res);
+		detector->detect2(batch_img, detections);
+		//TENSORFLOW get rect's feature.
+		if(FeatureTensor::getInstance()->getRectsFeature(currentFrame, detections) == false) {
+			std::cout<<"Error Tensorflow get rects";
+		}
+
+		t.predict();
+		t.update(detections);
+
+		
+
+
+		std::vector<RESULT_DATA> result;
+		
+		for(Track& track: t.tracks){
+			if (!track.is_confirmed() || track.time_since_update > 5) continue;
+			result.push_back(std::make_pair(track.track_id, track.to_tlwh()));
+		}
+		char fname[255], showMsg[10];
+		
+		for(unsigned int k = 0; k < result.size(); k++) {
+			DETECTBOX tmp = result[k].second;
+			cv::Rect rect = cv::Rect(tmp(0), tmp(1), tmp(2), tmp(3));
+			cv::rectangle(currentFrame, rect, Scalar(255, 255, 0), 2);
+			sprintf(showMsg, "%d", result[k].first);
+			putText(currentFrame, showMsg, cv::Point(rect.x, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.8, Scalar(255, 255, 0), 2);
+		}
 		auto end= std::chrono::steady_clock::now();
 
 		double elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -108,25 +137,11 @@ int main()
 
 		std::stringstream stream2;
 		stream2<<"FPS="<<fps<<" Inference time="<<elapsed<<" "<<cfg.file_model_weights;
-		cv:putText(batch_img[0],stream2.str(),cv::Point(20,50),0, 0.5, cv::Scalar(0, 0, 255), 2);
-		//display
-		for (int i=0;i<batch_img.size();++i)
-		{
-			for (const auto &r : batch_res[i])
-			{
-				std::cout <<"batch "<<i<< " id:" << r.id << " prob:" << r.prob << " rect:" << r.rect << std::endl;
-				cv::rectangle(batch_img[i], r.rect, cv::Scalar(255, 0, 0), 2);
-				std::stringstream stream;
+		cv:putText(currentFrame,stream2.str(),cv::Point(20,50),0, 0.5, cv::Scalar(0, 0, 255), 2);
 
-				stream << std::fixed << std::setprecision(2) << "id:" << r.id << "  score:" << r.prob;
-				stream2<<"Test Test";
-				cv::putText(batch_img[i], stream.str(), cv::Point(r.rect.x, r.rect.y - 5), 0, 0.5, cv::Scalar(0, 0, 255), 2);
-				
 
-			}
-			cv::imshow("imag2e"+std::to_string(i), batch_img[i]);
-		}
-		cv::waitKey(10);
+		imshow("DeepSortTracking", currentFrame);
+		waitKey(10);
 	
 	}
 	
@@ -134,5 +149,7 @@ int main()
 	cv::destroyAllWindows();
 	
 }
+
+
 
 

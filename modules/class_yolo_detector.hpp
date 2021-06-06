@@ -18,6 +18,7 @@
 
 #include "class_detector.h"
 #include "class_timer.hpp"
+#include "./../deep_sort/feature/model.h"
 class YoloDectector
 {
 public:
@@ -84,19 +85,18 @@ public:
 		}
 		timer.out("post");
 	}
-	//Edited detect so it uses De
+	//Edited detect so it uses DETECTIONS Class
+	//TODO: Edit vector out
 	void detect2(const std::vector<cv::Mat>	&vec_image,
-				std::vector<BatchResult> &vec_batch_result) {
+				DETECTIONS &detections) {
 		Timer timer;
 		std::vector<DsImage> vec_ds_images;
-		vec_batch_result.clear();
-		vec_batch_result.resize(vec_image.size());
+		detections.clear();
 		for (const auto &img:vec_image)
 		{
 			vec_ds_images.emplace_back(img, _vec_net_type[_config.net_type], _p_net->getInputH(), _p_net->getInputW());
 		}
 		cv::Mat trtInput = blobFromDsImages(vec_ds_images, _p_net->getInputH(),_p_net->getInputW());
-		timer.out("pre");
 		_p_net->doInference(trtInput.data, vec_ds_images.size());
 		timer.reset();
 		for (uint32_t i = 0; i < vec_ds_images.size(); ++i)
@@ -111,22 +111,27 @@ public:
 			{
 				continue;
 			}
-			std::vector<Result> vec_result(0);
+			
 			for (const auto &b : remaining)
 			{
-				Result res;
-				res.id = b.label;
-				res.prob = b.prob;
-				const int x = b.box.x1;
-				const int y = b.box.y1;
-				const int w = b.box.x2 - b.box.x1;
-				const int h = b.box.y2 - b.box.y1;
-				res.rect = cv::Rect(x, y, w, h);
-				vec_result.push_back(res);
+				if(b.prob!=0){
+					DETECTION_ROW detectRow;
+					detectRow.confidence=b.prob;
+					detectRow.class_id=b.label;
+					
+					const int x = b.box.x1;
+					const int y = b.box.y1;
+					const int w = b.box.x2 - b.box.x1;
+					const int h = b.box.y2 - b.box.y1;
+					detectRow.tlwh= DETECTBOX(x, y, w, h);
+					detections.push_back(detectRow);
+				}
+
+
 			}
-			vec_batch_result[i] = vec_result;
+			
 		}
-		timer.out("post");
+
 	}
 
 private:
