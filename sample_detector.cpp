@@ -2,11 +2,15 @@
 #include "./modules/class_detector.h"
 #include "./deep_sort/matching/tracker.h"
 #include "./deep_sort/feature/FeatureTensor.h"
-
+#include "./evaluation/kitti.h"
 
 #include <memory>
 #include <thread>
 #include <chrono>
+
+#include <vector>
+#include <string>
+
 
 #define args_nn_budget 100
 #define args_max_cosine_distance 0.2
@@ -14,6 +18,11 @@
 #define args_nms_max_overlap 1.0
 using namespace cv;
 using namespace std;
+
+
+
+
+
 
 cv::VideoCapture *cap;
 
@@ -79,9 +88,83 @@ Config getDetectorConfig()
 	return config_v4;
 }
 
+string directory="/home/fze2/Desktop/kitti_data/testing/image_02/";
+
 int main()
 {
+	auto mapWithFolderNames=KITTI_EVA::getFolderPathes(directory);
 	
+
+	for (auto item:mapWithFolderNames){
+		auto mapWithFileNames=KITTI_EVA::getFilePathes(item.second);
+
+		tracker t;
+		Timer timer;
+		InitCap();
+		cv::Mat currentFrame;
+		int counter=0;
+		Config cfg=getDetectorConfig();
+		cfg.detect_thresh=0.3;
+		std::unique_ptr<Detector> detector(new Detector());
+		detector->init(cfg);
+
+		DETECTIONS detections;
+
+		for(auto i2:mapWithFileNames){
+
+			std::string image_path = samples::findFile(i2.second);
+    		currentFrame = imread(image_path, IMREAD_COLOR);
+			std::vector<cv::Mat> batch_img;
+			batch_img.push_back(currentFrame);
+
+			//detect
+			auto start= std::chrono::steady_clock::now();
+
+			//std::cout<<"Detect Count="<<detections.size()<<"\n";
+
+			detector->detect2(batch_img, detections);
+			//TENSORFLOW get rect's feature.
+			if(FeatureTensor::getInstance()->getRectsFeature(currentFrame, detections) == false) {
+				std::cout<<"Error Tensorflow get rects";
+			}
+
+			t.predict();
+			t.update(detections);
+
+			std::vector<RESULT_DATA> result;
+			
+			for(Track& track: t.tracks){
+				if (!track.is_confirmed() || track.time_since_update > 1) continue;
+				result.push_back(std::make_pair(track.track_id, track.to_tlwh()));
+			}
+			char fname[255], showMsg[10];
+			
+			for(unsigned int k = 0; k < result.size(); k++) {
+				DETECTBOX tmp = result[k].second;
+				cv::Rect rect = cv::Rect(tmp(0), tmp(1), tmp(2), tmp(3));
+				cv::rectangle(currentFrame, rect, Scalar(255, 255, 0), 2);
+				sprintf(showMsg, "%d", result[k].first);
+				putText(currentFrame, showMsg, cv::Point(rect.x, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.4, Scalar(255, 255, 0), 2);
+				putText(currentFrame, "Amina Zikki", cv::Point(rect.x+20, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.4, Scalar(255, 255, 0), 2);
+			}
+			auto end= std::chrono::steady_clock::now();
+
+			double elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+			double fps=1000/elapsed;
+
+			std::stringstream stream2;
+			stream2<<"FPS="<<fps<<" Inference time="<<elapsed<<" "<<cfg.file_model_weights;
+			cv:putText(currentFrame,stream2.str(),cv::Point(20,50),0, 0.5, cv::Scalar(0, 0, 255), 2);
+
+
+			imshow("DeepSortTracking", currentFrame);
+			waitKey(10);
+		}
+		
+	}
+	
+
+
 	tracker t;
 	Timer timer;
 	InitCap();
@@ -94,54 +177,7 @@ int main()
 
 	DETECTIONS detections;
 	while(!(currentFrame=getNextFrame()).empty()){
-		std::vector<cv::Mat> batch_img;
-		batch_img.push_back(currentFrame);
-
-		//detect
 		
-		auto start= std::chrono::steady_clock::now();
-
-		//std::cout<<"Detect Count="<<detections.size()<<"\n";
-
-		detector->detect2(batch_img, detections);
-		//TENSORFLOW get rect's feature.
-		if(FeatureTensor::getInstance()->getRectsFeature(currentFrame, detections) == false) {
-			std::cout<<"Error Tensorflow get rects";
-		}
-
-		t.predict();
-		t.update(detections);
-
-		
-
-
-		std::vector<RESULT_DATA> result;
-		
-		for(Track& track: t.tracks){
-			if (!track.is_confirmed() || track.time_since_update > 5) continue;
-			result.push_back(std::make_pair(track.track_id, track.to_tlwh()));
-		}
-		char fname[255], showMsg[10];
-		
-		for(unsigned int k = 0; k < result.size(); k++) {
-			DETECTBOX tmp = result[k].second;
-			cv::Rect rect = cv::Rect(tmp(0), tmp(1), tmp(2), tmp(3));
-			cv::rectangle(currentFrame, rect, Scalar(255, 255, 0), 2);
-			sprintf(showMsg, "%d", result[k].first);
-			putText(currentFrame, showMsg, cv::Point(rect.x, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.8, Scalar(255, 255, 0), 2);
-		}
-		auto end= std::chrono::steady_clock::now();
-
-		double elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-		double fps=1000/elapsed;
-
-		std::stringstream stream2;
-		stream2<<"FPS="<<fps<<" Inference time="<<elapsed<<" "<<cfg.file_model_weights;
-		cv:putText(currentFrame,stream2.str(),cv::Point(20,50),0, 0.5, cv::Scalar(0, 0, 255), 2);
-
-
-		imshow("DeepSortTracking", currentFrame);
-		waitKey(10);
 	
 	}
 	
