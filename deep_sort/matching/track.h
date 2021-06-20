@@ -58,7 +58,7 @@ class Track
 
 public:
     Track(KAL_MEAN& mean, KAL_COVA& covariance, int track_id,
-          int n_init, int max_age, const FEATURE& feature);
+          int n_init, int max_age, const FEATURE& feature, int classId);
     void predit(KalmanFilter *kf);
     void update(KalmanFilter * const kf, const DETECTION_ROW &detection);
     void mark_missed();
@@ -77,6 +77,7 @@ public:
     int _n_init;
     int _max_age;
     TrackState state;
+    int class_id;
 private:
     void featuresAppendOne(const FEATURE& f);
 };

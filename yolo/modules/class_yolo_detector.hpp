@@ -17,7 +17,7 @@
 #include <stdio.h>  /* defines FILENAME_MAX */
 
 #include "class_detector.h"
-#include "class_timer.hpp"
+#include "../extra/class_timer.hpp"
 #include "./../deep_sort/feature/model.h"
 class YoloDectector
 {

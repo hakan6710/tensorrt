@@ -39,9 +39,9 @@ map<int, string> getFilePathes(string directory)
     return map1;
 }
 
-map<int, string> getFolderPathes(string directory)
+map<string, string> getFolderPathes(string directory)
 {
-    map<int, string> map1;
+    map<string, string> map1;
     int number_of_zeros=4;
 	string original_string=to_string(42);
 	std::string dest = std::string( number_of_zeros, '0').append( original_string);
@@ -55,7 +55,7 @@ map<int, string> getFolderPathes(string directory)
         if (FILE *file = fopen(filepath.c_str(), "r")) 
         {
             fclose(file);
-            map1.insert(std::pair<int, string>(i,filepath+"/"));
+            map1.insert(std::pair<string, string>(dest,filepath+"/"));
             
         }else {break;}
         

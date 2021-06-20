@@ -1,6 +1,6 @@
 #include "track.h"
 
-Track::Track(KAL_MEAN& mean, KAL_COVA& covariance, int track_id, int n_init, int max_age, const FEATURE& feature)
+Track::Track(KAL_MEAN& mean, KAL_COVA& covariance, int track_id, int n_init, int max_age, const FEATURE& feature, int classId)
 {
     this->mean = mean;
     this->covariance = covariance;
@@ -14,6 +14,7 @@ Track::Track(KAL_MEAN& mean, KAL_COVA& covariance, int track_id, int n_init, int
 
     this->_n_init = n_init;
     this->_max_age = max_age;
+    this->class_id=classId;
 }
 
 void Track::predit(KalmanFilter *kf)

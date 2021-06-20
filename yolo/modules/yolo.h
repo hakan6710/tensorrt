@@ -37,7 +37,7 @@ SOFTWARE.
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include "class_timer.hpp"
+#include "../extra/class_timer.hpp"
 #include "opencv2/opencv.hpp"
 #include "detect.h"
 //#include "logging.h"

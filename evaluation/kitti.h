@@ -8,7 +8,7 @@ using namespace std;
 namespace KITTI_EVA{
 
 map<int, string> getFilePathes(string directory);
-map<int, string> getFolderPathes(string directory);
+map<string, string> getFolderPathes(string directory);
 }
 
 

@@ -3,7 +3,7 @@ project(yolo-trt VERSION 1.0)
 enable_language(CUDA)
 
 set(CMAKE_CXX_COMPILIER "/usr/bin/g++")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3 -Wno-write-strings")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3 -Wno-write-strings ")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,$ORIGIN")
 
 #cuda
@@ -26,7 +26,7 @@ find_package(TensorflowCC REQUIRED)
 
 #detector lib (cuda)
 file(GLOB_RECURSE sources  "deep_sort/*/*.cpp" "deep_sort/*/*.h"
-modules/*.hpp modules/*.cpp modules/*.h modules/*.cu extra/*.h 
+yolo/modules/*.hpp yolo/modules/*.cpp yolo/modules/*.h yolo/modules/*.cu yolo/extra/*.h 
 evaluation/*.cpp evaluation/*.h 
 
 )
@@ -36,13 +36,13 @@ evaluation/*.cpp evaluation/*.h
 #file(GLOB source_files "*.h" "*.cpp" "deep_sort/*/*.cpp" "deep_sort/*/*.h" )
 add_library(detector SHARED ${sources})
 
-target_include_directories(detector PRIVATE extra/ modules/ evaluation/  ${OpenCV_INCLUDE_DIRS} ${CUDA_TOOLKIT_ROOT_DIR}/include)
+target_include_directories(detector PRIVATE /yolo/extra/ /yolo/modules/ evaluation/  ${OpenCV_INCLUDE_DIRS} ${CUDA_TOOLKIT_ROOT_DIR}/include)
 target_link_libraries(detector TensorflowCC::TensorflowCC Eigen3::Eigen nvinfer nvinfer_plugin nvparsers "stdc++fs")
 
 
-add_executable(yolo-trt sample_detector.cpp )	
+add_executable(yolo-trt yolo/sample_detector.cpp )	
 			  
-target_include_directories(yolo-trt PRIVATE evaluation/ modules/ extra/ deep_sort/feature/ deep_sort/matching/ deep_sort/thirdPart)
+target_include_directories(yolo-trt PRIVATE evaluation/ yolo/modules/ yolo/extra/ deep_sort/feature/ deep_sort/matching/ deep_sort/thirdPart)
 target_link_libraries(yolo-trt detector ${OpenCV_LIBS})
 
 
