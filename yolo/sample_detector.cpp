@@ -229,7 +229,7 @@ void writeTracks(std::vector<Track> result, string fileName,int frameId){
 		dRow+=spacer+std::to_string(-1.000000);
 
 		ofstream myfile;
-    	myfile.open (".\\test"+fileName+".txt",ios::out | ios::app);
+    	myfile.open (fileName+".txt",ios::out | ios::app);
     	myfile << dRow <<"\n";
     	myfile.close();
 
