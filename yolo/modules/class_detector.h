@@ -4,7 +4,7 @@
 #include "../extra/API.h"
 #include <iostream>
 #include <opencv2/opencv.hpp>
-#include "./../deep_sort/feature/model.h"
+#include "../deep_sort/feature/model.h"
 
 struct Result
 {

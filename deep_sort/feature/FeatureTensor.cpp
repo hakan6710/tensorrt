@@ -23,6 +23,7 @@ FeatureTensor *FeatureTensor::getInstance() {
 }
 
 FeatureTensor::FeatureTensor() {
+	
 	//prepare model:
 	bool status = init();
 	if(status == false) exit(1);
@@ -44,7 +45,7 @@ void FeatureTensor::killIt(){
 }
 
 bool FeatureTensor::init() {
-
+	
 	ifstream ifile;
 	ifile.open(TENSORFLOW_MODEL_META);
 	if(ifile) {

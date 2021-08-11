@@ -94,11 +94,11 @@ DETECTIONS getNewDetections(Detector &detector,cv::Mat currentFrame){
 
 	//Popupalte detections for currentFrame
 	detector.detect2(batch_img, detections);
-
 	//TENSORFLOW get rect's feature.
 	if(FeatureTensor::getInstance()->getRectsFeature(currentFrame, detections) == false) {
 		throw std::runtime_error("Error Tensorflow get rects"); 
 	}
+
 
 	return detections;
 
@@ -141,6 +141,20 @@ void drawTracks(cv::Mat &currentFrame,std::vector<Track> result){
 		putText(currentFrame, showMsg, cv::Point(rect.x, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.4, Scalar(255, 255, 0), 2);
 	}
 }
+
+void drawTracks2(cv::Mat &currentFrame,DETECTIONS result){
+	
+	char fname[255], showMsg[100];
+	for (auto item:result){
+		DETECTBOX tmp = item.tlwh;
+		cv::Rect rect = cv::Rect(tmp(0), tmp(1), tmp(2), tmp(3));
+		cv::rectangle(currentFrame, rect, Scalar(255, 255, 0), 2);
+	}	
+
+}
+
+
+
 //0 -1 DontCare -1 -1 -10.000000 219.310000 188.490000 245.500000 218.560000 -1000.000000 -1000.000000 
 //-1000.000000 -10.000000 -1.000000 -1.000000 -1.000000
 
@@ -270,8 +284,8 @@ int main()
 
 			imshow("DeepSortTracking", currentFrame);
 			waitKey(10);
+			
 		}
-		
 	}
 		
 	cv::destroyAllWindows();
