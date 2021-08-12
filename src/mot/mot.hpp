@@ -32,6 +32,7 @@ Config getDetectorConfig();
 std::unique_ptr<Detector> InitDetector(string root_dir);
 DETECTIONS getNewDetections(Detector &detector,cv::Mat currentFrame);
 
+std::map<float,DETECTION_ROW> _mappingForSort;
 std::map<int, SORT::Track> sortTracks;
 
 };

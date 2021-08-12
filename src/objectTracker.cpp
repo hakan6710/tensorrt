@@ -29,15 +29,18 @@ void objectTracker::test(string root_dir){
 
             currentMot.detect(currentFrame);
             currentMot.track(currentFrame);
-           	std::map<int, SORT::Track> results= currentMot.getResults_sort();
-			
-            currentMot.drawTracks2(currentFrame,results);
+
+			std::vector<Track>  results= currentMot.getResults();
+			currentMot.drawTracks(currentFrame,results);
+
+			//Calls For Sort   
+			//std::map<int, SORT::Track> results= currentMot.getResults_sort();
+            //currentMot.drawTracks2(currentFrame,results);
 
 
 			imshow("DeepSortTracking", currentFrame);
 			waitKey(10);
 			counter++;
-			
 		}
 		break;
 		

@@ -6,7 +6,7 @@
 #define TENSORFLOW_MODEL_META "mot_files/deep_sort/111.meta"
 #define TENSORFLOW_MODEL "mot_files/deep_sort/mars-small128.ckpt-68577"
 
-#define  KITTI_Directory "/home/niro/Desktop/kitti_data/testing/image_02/"
+#define  KITTI_Directory "/home/fze2/Desktop/kitti_data/testing/image_02/"
 
 
 

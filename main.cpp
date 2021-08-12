@@ -6,9 +6,7 @@
 
 int main() {
     FHAC::objectTracker myTracker;
-    myTracker.test("/home/niro/Desktop/");
-   
-
+    myTracker.test("/home/fze2/Desktop/");
     
     return 0;
 }

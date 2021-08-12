@@ -1,9 +1,6 @@
-
-
 #include <memory>
 #include <thread>
 #include <chrono>
-
 #include <vector>
 #include <string>
 #include <fstream>
@@ -114,8 +111,17 @@ void mot::drawTracks2(cv::Mat &currentFrame, std::map<int, SORT::Track> tracks){
 	for(unsigned int k = 0; k < tracks.size(); k++) {
 		
 		cv::Rect rect = tracks[k].GetStateAsBbox();
+		float sum=rect.x+rect.y+rect.width+rect.height;
+		int class_id=0;
+		
+		if ( _mappingForSort.find(sum) == _mappingForSort.end() ) {
+  				// not found
+		}else {
+  			class_id=_mappingForSort.at(sum).class_id;
+			
+		}
 		cv::rectangle(currentFrame, rect, Scalar(255, 255, 0), 2);
-		sprintf(showMsg, "%d classid=%d", k, 0);
+		sprintf(showMsg, "%d classid=%d", k, class_id);
 		
 		putText(currentFrame, showMsg, cv::Point(rect.x, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.4, Scalar(255, 255, 0), 2);
 	}
@@ -125,21 +131,33 @@ void mot::drawTracks2(cv::Mat &currentFrame, std::map<int, SORT::Track> tracks){
 void mot::init(string root_dir){
 
 	_detector=InitDetector(root_dir);
-	//_deepSort.init(root_dir);
+	_deepSort.init(root_dir);
 
 };
 void mot::detect(cv::Mat currentFrame){
+	//_mappingForSort.clear();
 	_currentDetections=getNewDetections(*_detector,currentFrame);
 };
 void mot::track(cv::Mat currentFrame){
-	//_deepSort.track(currentFrame, _currentDetections);
-	this->sortTracks=_sort.main2(castTheData(_currentDetections));
+	_deepSort.track(currentFrame, _currentDetections);
+	//this->sortTracks=_sort.main2(castTheData(_currentDetections));
 };
 std::vector<Track>  mot::getResults(){
+	
 	return _deepSort.getTracks();
 };
 
 std::map<int, SORT::Track> mot::getResults_sort(){
+	for(auto item:_currentDetections){
+		DETECTBOX tmp = item.tlwh;
+		float sumOfValues=tmp(0)+tmp(1)+tmp(2)+tmp(3);
+
+		if ( _mappingForSort.find(sumOfValues) == _mappingForSort.end() ) {
+  			_mappingForSort.insert(std::make_pair(sumOfValues,item));
+		}else {
+			
+		}
+	}
 	return this->sortTracks;
 } 
 
