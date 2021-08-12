@@ -7,20 +7,12 @@
 namespace SORT{
 
     
-int Sort::main2(std::vector<cv::Rect> detections) {
-        // create SORT tracker
+std::map<int, Track>  Sort::main2(std::vector<cv::Rect> detections) {
         
-        /*** Run SORT tracker ***/
-        std::vector<std::vector<cv::Rect>> all_detections;
         tracker.Run(detections);
             
-        const auto tracks = tracker.GetTracks();
+        std::map<int, Track> tracks = tracker.GetTracks();
         /*** Tracker update done ***/
-
-}
-
-
-
-
-
+        return tracks;
+}       
 }

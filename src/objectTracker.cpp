@@ -9,7 +9,7 @@ void objectTracker::init(){
     
 }
 
-void objectTracker::test(){
+void objectTracker::test(string root_dir){
 
     auto mapWithFolderNames=KITTI_EVA::getFolderPathes(KITTI_Directory);
 	for (auto item:mapWithFolderNames){
@@ -17,7 +17,7 @@ void objectTracker::test(){
 
 		cv::Mat currentFrame;
         mot currentMot;
-        currentMot.init();
+        currentMot.init(root_dir);
 		int counter=0;
 		for(auto i2:mapWithFileNames){
 			
@@ -29,16 +29,15 @@ void objectTracker::test(){
 
             currentMot.detect(currentFrame);
             currentMot.track(currentFrame);
-            std::vector<Track> results= currentMot.getResults();
-
-            currentMot.drawTracks(currentFrame,results);
+           	std::map<int, SORT::Track> results= currentMot.getResults_sort();
+			
+            currentMot.drawTracks2(currentFrame,results);
 
 
 			imshow("DeepSortTracking", currentFrame);
 			waitKey(10);
 			counter++;
-			if(counter>10)
-				break;
+			
 		}
 		break;
 		

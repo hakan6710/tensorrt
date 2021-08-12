@@ -20,8 +20,9 @@ class Sort{
 
 public:
     Tracker tracker;
-    int main2(std::vector<cv::Rect> detections);
+    std::map<int, Track>  main2(std::vector<cv::Rect> detections);
 
 };
 }
+
 #endif

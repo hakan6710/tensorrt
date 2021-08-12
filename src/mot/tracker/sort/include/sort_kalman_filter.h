@@ -1,7 +1,7 @@
 #ifndef SORT_KALMAN_FILTER_H_
 #pragma once
 #include <iostream>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 
 // abstract class for Kalman filter

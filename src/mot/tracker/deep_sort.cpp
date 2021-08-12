@@ -2,10 +2,10 @@
 
 namespace FHAC{
 
-void deep_sort::init(){
+void deep_sort::init(std::string root_dir){
 
     
-    _featureTensor=FeatureTensor::getInstance();
+    _featureTensor=FeatureTensor::getInstance(root_dir);
 
 }
 

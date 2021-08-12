@@ -14,16 +14,16 @@ using namespace tensorflow;
 
 FeatureTensor *FeatureTensor::instance = NULL;
 
-FeatureTensor *FeatureTensor::getInstance() {
+FeatureTensor *FeatureTensor::getInstance(string root_dir) {
 	if(instance == NULL) {
-		instance = new FeatureTensor();
+		instance = new FeatureTensor(root_dir);
 	}
 	return instance;
 }
 
-FeatureTensor::FeatureTensor() {
+FeatureTensor::FeatureTensor(string root_dir) {
 	//prepare model:
-	bool status = init();
+	bool status = init(root_dir);
 	if(status == false) exit(1);
 }
 
@@ -42,11 +42,17 @@ void FeatureTensor::killIt(){
 	instance=NULL;
 }
 
-bool FeatureTensor::init() {
+bool FeatureTensor::init(string root_dir) {
 
 	ifstream ifile;
 	
-	ifile.open(TENSORFLOW_MODEL_META);
+	string modelMeta=TENSORFLOW_MODEL_META;
+	modelMeta=root_dir+ modelMeta;
+
+	string tensorflowModel=TENSORFLOW_MODEL;
+	tensorflowModel=root_dir+tensorflowModel;
+
+	ifile.open(modelMeta);
 	if(ifile) {
 		cout<<"file exists";
 	} else {
@@ -57,7 +63,7 @@ bool FeatureTensor::init() {
 	session = NewSession(sessOptions);
 	if(session == nullptr) return false;
 
-	const tensorflow::string pathToGraph = TENSORFLOW_MODEL_META;
+	const tensorflow::string pathToGraph = modelMeta;
 	Status status;
 	MetaGraphDef graph_def;
 	status = ReadBinaryProto(tensorflow::Env::Default(), pathToGraph, &graph_def);
@@ -66,7 +72,7 @@ bool FeatureTensor::init() {
 	status = session->Create(graph_def.graph_def());
 	if(status.ok() == false) return false;
 
-	const tensorflow::string checkpointPath = TENSORFLOW_MODEL;
+	const tensorflow::string checkpointPath = tensorflowModel;
 	Tensor checkpointTensor(DT_STRING, TensorShape());
 	checkpointTensor.scalar<tensorflow::tstring>()() = checkpointPath;
 	status = session->Run(

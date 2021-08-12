@@ -6,22 +6,23 @@
 
 #include "model.h"
 #include "dataType.h"
+#include <string>
 
 typedef unsigned char uint8;
 
 class FeatureTensor
 {
 public:
-	static FeatureTensor* getInstance();
+	static FeatureTensor* getInstance(std::string root_dir);
 	bool getRectsFeature(const cv::Mat& img, DETECTIONS& d);
 	void killIt();
 
 private:
-	FeatureTensor();
+	FeatureTensor(std::string root_dir);
 	FeatureTensor(const FeatureTensor&);
 	FeatureTensor& operator = (const FeatureTensor&);
 	static FeatureTensor* instance;
-	bool init();
+	bool init(std::string root_dir);
 	~FeatureTensor();
 	
 

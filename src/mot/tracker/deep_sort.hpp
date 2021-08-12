@@ -10,7 +10,7 @@ namespace FHAC{
 class deep_sort{
 
 public: 
-    void init();
+    void init(std::string root_dir);
     void track(cv::Mat currentFrame, DETECTIONS detections);
     std::vector<Track>  getTracks();
 

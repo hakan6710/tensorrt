@@ -11,7 +11,7 @@ public:
 
 void init();
 
-void test();
+void test(string root_dir);
 
 private:
 Config currentConfig;

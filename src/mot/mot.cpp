@@ -13,30 +13,32 @@
 #include <mot_config_files.hpp>
 
 
+
 using namespace cv;
 using namespace std;
 
 
 namespace FHAC{
 
+
+std::vector<cv::Rect> castTheData(DETECTIONS result){
+	
+	std::vector<cv::Rect> detect_rec;
+	for(int i=0; i<result.size(); i++){
+			cv::Rect temp;
+			temp.x=result[i].tlwh[0];
+			temp.y=result[i].tlwh[1];
+			temp.width=result[i].tlwh[2];
+			temp.height=result[i].tlwh[3];
+
+			detect_rec.push_back(temp);
+	}
+	return detect_rec;
+}
+
 Config mot::getDetectorConfig()
 {
-	Config config_v3;
-	config_v3.net_type = YOLOV3;
-	config_v3.file_model_cfg = "../yolo/configs/yolov3.cfg";
-	config_v3.file_model_weights = "../yolo/configs/yolov3.weights";
-	config_v3.calibration_image_list_file_txt = "../yolo/configs/calibration_images.txt";
-	config_v3.inference_precison =FP32;
-	config_v3.detect_thresh = 0.5;
-
-	Config config_v3_tiny;
-	config_v3_tiny.net_type = YOLOV3_TINY;
-	config_v3_tiny.detect_thresh = 0.7;
-	config_v3_tiny.file_model_cfg = "../yolo/configs/yolov3-tiny.cfg";
-	config_v3_tiny.file_model_weights = "../yolo/configs/yolov3-tiny.weights";
-	config_v3_tiny.calibration_image_list_file_txt = "../yolo/configs/calibration_images.txt";
-	config_v3_tiny.inference_precison = FP32;
-
+	
 	Config config_v4;
 	config_v4.net_type = YOLOV4;
 	config_v4.file_model_cfg = YOLO_V4_CONFIG;
@@ -45,21 +47,6 @@ Config mot::getDetectorConfig()
 	config_v4.inference_precison =FP32;
 	config_v4.detect_thresh = 0.5;
 
-	Config config_v4_tiny;
-	config_v4_tiny.net_type = YOLOV4_TINY;
-	config_v4_tiny.detect_thresh = 0.5;
-	config_v4_tiny.file_model_cfg = "../yolo/configs/yolov4-tiny.cfg";
-	config_v4_tiny.file_model_weights = "../yolo/configs/yolov4-tiny.weights";
-	config_v4_tiny.calibration_image_list_file_txt = "../yolo/configs/calibration_images.txt";
-	config_v4_tiny.inference_precison = FP32;
-
-	Config config_v5;
-	config_v5.net_type = YOLOV5;
-	config_v5.detect_thresh = 0.5;
-	config_v5.file_model_cfg = "../yolo/configs/yolov5-4.0/yolov5s.cfg";
-	config_v5.file_model_weights = "../yolo/configs/yolov5-4.0/yolov5s.weights";
-	config_v5.calibration_image_list_file_txt = "../yolo/configs/calibration_images.txt";
-	config_v5.inference_precison = FP32;
 
 	return config_v4;
 }
@@ -80,11 +67,16 @@ DETECTIONS mot::getNewDetections(Detector &detector,cv::Mat currentFrame){
 }
 
 
-std::unique_ptr<Detector> mot::InitDetector(){
+std::unique_ptr<Detector> mot::InitDetector(string root_dir){
 	Config cfg=getDetectorConfig();
 	cfg.detect_thresh=0.3;
 	std::unique_ptr<Detector> detector(new Detector());
-	
+
+	//Add the root_dir
+	cfg.calibration_image_list_file_txt= root_dir+cfg.calibration_image_list_file_txt;
+	cfg.file_model_cfg=root_dir+cfg.file_model_cfg;
+	cfg.file_model_weights=root_dir+cfg.file_model_weights;
+
 	detector->init(cfg);
 
 	return detector;
@@ -101,7 +93,6 @@ void mot::drawDetections(cv::Mat &currentFrame,DETECTIONS result){
 		cv::Rect rect = cv::Rect(tmp(0), tmp(1), tmp(2), tmp(3));
 		cv::rectangle(currentFrame, rect, Scalar(255, 255, 0), 2);
 	}	
-
 }
 void mot::drawTracks(cv::Mat &currentFrame,std::vector<Track> result){
 	
@@ -116,43 +107,44 @@ void mot::drawTracks(cv::Mat &currentFrame,std::vector<Track> result){
 		putText(currentFrame, showMsg, cv::Point(rect.x, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.4, Scalar(255, 255, 0), 2);
 	}
 
-	
+}
 
+void mot::drawTracks2(cv::Mat &currentFrame, std::map<int, SORT::Track> tracks){
+	char fname[255], showMsg[100];
+	for(unsigned int k = 0; k < tracks.size(); k++) {
+		
+		cv::Rect rect = tracks[k].GetStateAsBbox();
+		cv::rectangle(currentFrame, rect, Scalar(255, 255, 0), 2);
+		sprintf(showMsg, "%d classid=%d", k, 0);
+		
+		putText(currentFrame, showMsg, cv::Point(rect.x, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.4, Scalar(255, 255, 0), 2);
+	}
 
 }
 
-void mot::init(){
+void mot::init(string root_dir){
 
-	_detector=InitDetector();
-	_deepSort.init();
+	_detector=InitDetector(root_dir);
+	//_deepSort.init(root_dir);
 
 };
 void mot::detect(cv::Mat currentFrame){
 	_currentDetections=getNewDetections(*_detector,currentFrame);
 };
 void mot::track(cv::Mat currentFrame){
-	_deepSort.track(currentFrame, _currentDetections);
+	//_deepSort.track(currentFrame, _currentDetections);
+	this->sortTracks=_sort.main2(castTheData(_currentDetections));
 };
 std::vector<Track>  mot::getResults(){
 	return _deepSort.getTracks();
 };
 
+std::map<int, SORT::Track> mot::getResults_sort(){
+	return this->sortTracks;
+} 
 
 
-std::vector<cv::Rect> castTheData(DETECTIONS result){
-	
-	std::vector<cv::Rect> detect_rec;
-	for(int i=0; i<result.size(); i++){
-			cv::Rect temp;
-			temp.x=result[i].tlwh[0];
-			temp.y=result[i].tlwh[1];
-			temp.width=result[i].tlwh[2];
-			temp.height=result[i].tlwh[3];
 
-			detect_rec.push_back(temp);
-	}
-	return detect_rec;
-}
 
 
 }
