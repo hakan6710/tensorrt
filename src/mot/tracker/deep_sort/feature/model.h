@@ -1,6 +1,6 @@
 #ifndef MODEL_H
 #define MODEL_H
-#include "./dataType.h"
+#include "dataType.h"
 #include <map>
 
 

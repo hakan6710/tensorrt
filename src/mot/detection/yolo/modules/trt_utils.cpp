@@ -84,7 +84,7 @@ bool fileExists(const std::string fileName, bool verbose)
 {
     if (!std::experimental::filesystem::exists(std::experimental::filesystem::path(fileName)))
     {
-        if (verbose) std::cout << "File does not exist : " << fileName << std::endl;
+        if (verbose) std::cout << "File does not exist : " << std::experimental::filesystem::path(fileName) << std::endl;
         return false;
     }
     return true;

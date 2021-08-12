@@ -10,6 +10,8 @@
 
 #include "mot.hpp"
 
+#include <mot_config_files.hpp>
+
 
 using namespace cv;
 using namespace std;
@@ -37,9 +39,9 @@ Config mot::getDetectorConfig()
 
 	Config config_v4;
 	config_v4.net_type = YOLOV4;
-	config_v4.file_model_cfg = "/home/fze2/Desktop/yolo-tensorrt/yolo/configs/yolov4.cfg";
-	config_v4.file_model_weights = "/home/fze2/Desktop/yolo-tensorrt/yolo/configs/yolov4.weights";
-	config_v4.calibration_image_list_file_txt = "/home/fze2/Desktop/yolo-tensorrt/yolo/configs/calibration_images.txt";
+	config_v4.file_model_cfg = YOLO_V4_CONFIG;
+	config_v4.file_model_weights = YOLO_V4_WEIGHTS;
+	config_v4.calibration_image_list_file_txt = YOLO_V4_CALIBRATION;
 	config_v4.inference_precison =FP32;
 	config_v4.detect_thresh = 0.5;
 

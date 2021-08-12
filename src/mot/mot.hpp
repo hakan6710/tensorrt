@@ -4,7 +4,7 @@
 #include "./tracker/deep_sort/matching/tracker.h"
 #include "./evaluation/kitti.h"
 
-#include "../../include/mot_config_files.hpp"
+#include "../include/mot_config_files.hpp"
 #include "./tracker/deep_sort.hpp"
 
 namespace FHAC {
