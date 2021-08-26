@@ -140,7 +140,7 @@ void mot::detect(cv::Mat currentFrame){
 };
 void mot::track(cv::Mat currentFrame){
 	_deepSort.track(currentFrame, _currentDetections);
-	//this->sortTracks=_sort.main2(castTheData(_currentDetections));
+	this->sortTracks=_sort.main2(castTheData(_currentDetections));
 };
 std::vector<Track>  mot::getResults(){
 	
@@ -148,16 +148,7 @@ std::vector<Track>  mot::getResults(){
 };
 
 std::map<int, SORT::Track> mot::getResults_sort(){
-	for(auto item:_currentDetections){
-		DETECTBOX tmp = item.tlwh;
-		float sumOfValues=tmp(0)+tmp(1)+tmp(2)+tmp(3);
 
-		if ( _mappingForSort.find(sumOfValues) == _mappingForSort.end() ) {
-  			_mappingForSort.insert(std::make_pair(sumOfValues,item));
-		}else {
-			
-		}
-	}
 	return this->sortTracks;
 } 
 

@@ -21,6 +21,8 @@ public:
     float GetNIS() const;
 
     int coast_cycles_ = 0, hit_streak_ = 0;
+    int class_id=0;
+    float detection_confidence=0;
 
 private:
     Eigen::VectorXd ConvertBboxToObservation(const cv::Rect& bbox) const;
