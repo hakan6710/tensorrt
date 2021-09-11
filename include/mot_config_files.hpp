@@ -10,8 +10,11 @@
 
 
 
-#define YOLO_V4_CONFIG  "/mot_files/yolo/yolov4.cfg"
-#define YOLO_V4_WEIGHTS "/mot_files/yolo/yolov4.weights"
+//#define YOLO_V4_CONFIG  "/mot_files/yolo/yolov4.cfg"
+//#define YOLO_V4_WEIGHTS "/mot_files/yolo/yolov4.weights"
+
+#define YOLO_V4_CONFIG  "/mot_files/yolo/yolov4-csp.cfg"
+#define YOLO_V4_WEIGHTS "/mot_files/yolo/yolov4-csp.weights"
 #define YOLO_V4_CALIBRATION "/mot_files/yolo/calibration_images.txt"
 
 

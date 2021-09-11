@@ -11,6 +11,7 @@
 
 
 
+
 using namespace cv;
 using namespace std;
 
@@ -125,6 +126,40 @@ void mot::drawTracks2(cv::Mat &currentFrame, std::map<int, SORT::Track> tracks){
 		
 		putText(currentFrame, showMsg, cv::Point(rect.x, rect.y), cv::FONT_HERSHEY_SIMPLEX, 0.4, Scalar(255, 255, 0), 2);
 	}
+
+}
+
+void mot::initProjectionPoints(std::vector<Track> ts){
+  
+  
+  _pointMatrix=cv::Mat_<cv::Point2f>();
+  _projectedPoints=std::vector<projectedPoint> ();
+
+  for(unsigned int k = 0; k < ts.size(); k++) {
+	DETECTBOX tmp = ts[k].to_tlwh();
+	float x=tmp(0)+(0.5)*tmp(2);
+	float y=tmp(1)+tmp(3);
+	_projectedPoints.push_back(projectedPoint(x,y));
+
+	cv::Point2f p(x,y);
+	_pointMatrix.push_back(p);
+  }
+  if(ts.size()>0){
+	  calculateProjection(_pointMatrix, _projectedPoints);
+  }
+
+}
+
+void mot::drawProjectionPoints(cv::Mat &currentFrame){
+  char fname[255], showMsg[100];
+  for(unsigned int k = 0; k < _projectedPoints.size(); k++) {
+
+	cv::Point2f p(_projectedPoints[k].x_picture,_projectedPoints[k].y_picture);
+	cv::circle(currentFrame,p, 30, (0,0,255), -1);
+	sprintf(showMsg, "Dist=%f", _projectedPoints[k].distance);
+
+	putText(currentFrame, showMsg, p, cv::FONT_HERSHEY_SIMPLEX, 0.4, Scalar(255, 255, 0), 2);
+  }
 
 }
 

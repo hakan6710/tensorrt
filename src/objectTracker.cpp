@@ -33,6 +33,10 @@ void objectTracker::test(string root_dir){
 			std::vector<Track>  results= currentMot.getResults();
 			currentMot.drawTracks(currentFrame,results);
 
+
+			// currentMot.initProjectionPoints(results);
+			// currentMot.drawProjectionPoints(currentFrame);
+
 			//Calls For Sort   
 			//std::map<int, SORT::Track> results= currentMot.getResults_sort();
             //currentMot.drawTracks2(currentFrame,results);

@@ -7,6 +7,8 @@
 #include "../include/mot_config_files.hpp"
 #include "./tracker/deep_sort.hpp"
 #include "tracker/sort/include/sort.h"
+#include "./birdsEyeView/projection.hpp"
+
 
 namespace FHAC {
 
@@ -21,7 +23,16 @@ void drawDetections(cv::Mat &currentFrame,DETECTIONS result);
 void drawTracks(cv::Mat &currentFrame,std::vector<Track> result);
 void drawTracks2(cv::Mat &currentFrame,std::map<int, SORT::Track>);
 
+
+
+void initProjectionPoints(std::vector<Track> ts);
+std::vector<projectedPoint> _projectedPoints;
+cv::Mat_<cv::Point2f> _pointMatrix;
+void drawProjectionPoints(cv::Mat &currentFrame);
+
 std::map<int, SORT::Track> getResults_sort();
+
+
 
 private:
 deep_sort _deepSort;
@@ -34,6 +45,9 @@ DETECTIONS getNewDetections(Detector &detector,cv::Mat currentFrame);
 
 std::map<float,DETECTION_ROW> _mappingForSort;
 std::map<int, SORT::Track> sortTracks;
+
+
+
 
 };
 

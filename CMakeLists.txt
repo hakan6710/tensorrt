@@ -33,6 +33,7 @@ target_include_directories(detector PRIVATE
 ${OpenCV_INCLUDE_DIRS} 
 ${CUDA_TOOLKIT_ROOT_DIR}/include  
 ${PROJECT_SOURCE_DIR}/include
+
 )
 target_link_libraries(detector TensorflowCC::TensorflowCC Eigen3::Eigen nvinfer nvinfer_plugin nvparsers "stdc++fs" ${OpenCV_LIBS} ${Boost_LIBRARIES})
 
